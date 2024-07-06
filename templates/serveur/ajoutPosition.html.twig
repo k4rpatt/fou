@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvelle Position{% endblock %}
+
+{% block body %}
+    <h1>Ajouter une nouvelle position </h1>
+    <h3>pour l'alliance {{ alliance }} sur le serveur {{ serveur }}</h3>
+    {{ include('position/_form.html.twig') }}
+<br>
+    <img src="{{ path('app_serveur_map', {'numero': serveur.numero} ) }}" id="map">
+{#    <img src="{{ asset('images/' ~ serveur.numero ~ '.png') }}" id="map" >#}
+
+
+    <a href="{{ path('app_serveur_show', {'numero' : serveur.numero }) }}" class="btn btn-xs btn-primary">Retour au serveur {{ serveur }}</a>
+
+    <script>
+        const img = document.getElementById('map');
+
+        img.addEventListener("click", (event) => {
+            var x = event.clientX;
+            var y = event.clientY;
+            var pos = findPos(img); // id étant l'identifiant que tu donnes à ton image
+            var diffx = x - pos.x;
+            var diffy = y - pos.y;
+            document.getElementById('ajout_position_posX').value = diffx;
+            document.getElementById('ajout_position_posY').value = diffy;
+            document.getElementById('form_position_ajout').submit();
+        });
+        function findPos(el){
+            var x = y = 0;
+            if(el.offsetParent) {
+                x = el.offsetLeft - window.pageXOffset;
+                y = el.offsetTop - window.pageYOffset;
+                while(el = el.offsetParent) {
+                    x += el.offsetLeft;
+                    y += el.offsetTop;
+                }
+            }
+            return {'x':x, 'y':y};
+        }
+
+    </script>
+{% endblock %}
+
+
+{% block javascripts %}
+{{ parent() }}
+
+{% endblock %}

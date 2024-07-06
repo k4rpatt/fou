@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Serveur index{% endblock %}
+
+{% block body %}
+    <h1>Liste des serveurs</h1>
+    <table class="table ">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Numero</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        <a href="{{ path('app_serveur_new') }}" class="btn btn-xs btn-primary"><i class="fa-solid fa-plus"></i>Ajouter un serveur</a>
+        {% for serveur in serveurs %}
+            <tr>
+                <td>{{ serveur.id }}</td>
+                <td>{{ serveur.numero }}</td>
+                <td>
+                    <a href="{{ path('app_serveur_show', {'numero': serveur.numero}) }}" ><i class="fa-solid fa-eye"></i></a>
+                    <a href="{{ path('app_serveur_map', {'numero': serveur.numero}) }}" ><i class="fa-solid fa-map"></i></a>
+{#                    <a href="{{ path('app_serveur_edit', {'id': serveur.id}) }}"><i class="fa-regular fa-pen-to-square"></i></a>#}
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_serveur_new') }}" class="btn btn-xs btn-primary"><i class="fa-solid fa-plus"></i>Ajouter un serveur</a>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Alliance{% endblock %}
+
+{% block body %}
+    <h1>Create new Alliance</h1>
+
+    {{ include('alliance/_form.html.twig') }}
+
+    <a href="{{ path('app_alliance_index') }}" class="btn btn-primary">retour</a>
+{% endblock %}
