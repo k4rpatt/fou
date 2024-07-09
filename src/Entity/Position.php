@@ -27,6 +27,9 @@ class Position
     #[ORM\JoinColumn(nullable: false)]
     private ?Serveur $serveur = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $cible = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -83,5 +86,17 @@ class Position
     public function __toString()
     {
         return "(".$this->getPosX().";".$this->getPosY().")";
+    }
+
+    public function getCible(): ?string
+    {
+        return $this->cible;
+    }
+
+    public function setCible(?string $cible): static
+    {
+        $this->cible = $cible;
+
+        return $this;
     }
 }

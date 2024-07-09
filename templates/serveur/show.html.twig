@@ -19,6 +19,7 @@
     </table>#}
 <hr>
     <a href="{{ path('app_serveur_new_alliance', {'numero' : serveur.numero}) }}" class="btn btn-primary">Ajouter une alliance</a>
+    <a href="{{ path('app_serveur_show', {'numero' : serveur.numero }) }}" class="btn btn-xs btn-primary">Rafraichir la carte</a>
     <a href="{{ path('app_serveur_index') }}" class="btn btn-primary">retour à la liste des serveurs</a>
 
     {#    <a href="{{ path('app_serveur_update_map', {'id' : serveur.id}) }}">Mettre à jour la map</a>#}
@@ -61,22 +62,13 @@
 {#    <img src="{{ asset('images/' ~ serveur.numero ~ '.png') }}" id="map{{ serveur.numero }}">#}
 
     <br>
-    <div class="row">
-        <div class="col">
-            {{ include('position/_form.html.twig') }}
-        </div>
-        <<div class="col">
 
-        </div>
+            {{ include('serveur/_formPosition.html.twig') }}
 
-
-    </div>
 
     <img src="{{ path('app_serveur_map', {'numero': serveur.numero} ) }}" id='map'>
     {#    <img src="{{ asset('images/' ~ serveur.numero ~ '.png') }}" id="map" >#}
 
-
-    <a href="{{ path('app_serveur_show', {'numero' : serveur.numero }) }}" class="btn btn-xs btn-primary">Retour au serveur {{ serveur }}</a>
 
     <script>
         const img = document.getElementById('map');
@@ -96,7 +88,7 @@
             }
 
             document.getElementById('position_serveur_posX').value = xconv;
-            document.getElementById('position_serveur_posY').value = yconv;
+            document.getElementById('position_serveur_posY').value = Math.min(Math.max(yconv,1),19);
             // document.getElementById('form_position_ajout').submit();
         });
         function findPos(el){

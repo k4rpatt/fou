@@ -17,6 +17,7 @@ use Imagine\Gd\Imagine;
 use Imagine\Image\Box;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -68,20 +69,48 @@ class ServeurController extends AbstractController
         $position = new Position();
         $position->setServeur($serveur);
         $form = $this->createForm(PositionServeurType::class, $position);
+        $form
+            ->add('maj', SubmitType::class, ['label' => 'Mise à jour proprio', 'attr' => ['class' => 'btn btn-success']])
+            ->add('attaque', SubmitType::class, ['label' => 'attaque', 'attr' => ['class' => 'btn btn-danger']])
+            ->add('defense', SubmitType::class, ['label' => 'défense', 'attr' => ['class' => 'btn btn-warning']])
+            ->add('immunite', SubmitType::class, ['label' => 'immunité', 'attr' => ['class' => 'btn btn-primary']]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $autre_position = $positionRepository->findOneByPosition($position);
             if ($autre_position) {
-                $this->addFlash('warning', 'cette position est déjà attribuée');
-                if ($position->getAlliance()->getId() == $autre_position->getAlliance()->getId()){
-                    $entityManager->remove($autre_position);
-                    $this->addFlash('danger', 'Suppression de la position');
+//                $this->addFlash('warning', 'cette position est déjà attribuée');
+                if ($form->getClickedButton()) {
+                    switch ($form->getClickedButton()->getName()){
+                        case 'attaque':
+                            $this->addFlash('warning','ATTAQUE !');
+                            $autre_position->setCible('attaque');
+                            break;
+                        case 'defense':
+                            $this->addFlash('warning','DEFENSE !');
+                            $autre_position->setCible('défense');
+                            break;
+                        case 'immunite':
+                            $this->addFlash('warning','IMMU !');
+                            $autre_position->setCible('immunité');
+                            break;
+                        default:
+                            if ($position->getAlliance()->getId() == $autre_position->getAlliance()->getId()){
+                                $entityManager->remove($autre_position);
+                                $this->addFlash('danger', 'Suppression de la position');
+                            }
+                            else {
+                                $autre_position->setAlliance($position->getAlliance());
+                                $this->addFlash('warning','Changement d\'alliance !');
+                            }
+                    }
                 }
                 else {
-                    $autre_position->setAlliance($position->getAlliance());
-                    $this->addFlash('warning','Changement d\'alliance !');
+                    $this->addFlash('warning','clic non detecté !');
+
                 }
+
+
             }
             else {
                 $entityManager->persist($position);
@@ -142,43 +171,24 @@ class ServeurController extends AbstractController
 //        $image = $imagine->open('images/Season1.png');
 //        $image = imagecreatefrompng('images/Season1.png');
         $this->makemapvierge();
-        $image = $this->image;
-        $logo_attaque = imagecreatefrompng('images/attaque.png');
-        $logo_bouclier = imagecreatefrompng('images/bouclier.png');
-        $logo_immu = imagecreatefrompng('images/immu.png');
-        //imagescale($image,800);
 
+        //imagescale($image,800);
+        $image = $this->image;
         foreach ($serveur->getPositions() as $position)
         {
             $x = $this->conversionX($position->getPosX());
             $y = $this->conversionY($position->getPosX(),$position->getPosY());
-//            $this->addFlash('warning',' x :'.$position->getPosX().' => '.$x);
-            switch ($position->getAlliance()->getNom()){
-                case "attaque":
-                    imagecopy($image,$logo_attaque, $x-50, $y-50, 0,0, 100, 100);
-                    break;
-                case "défense":
-                    imagecopy($image,$logo_bouclier, $x-50, $y-50, 0,0, 100, 100);
-                    break;
-                case "immunité":
-                    imageellipse($image, $x, $y, 60, 60, $position->getAlliance()->getGDColor($image));
-                    imageellipse($image, $x, $y, 80, 80, $position->getAlliance()->getGDColor($image));
-                    imageellipse($image, $x, $y, 100, 100, $position->getAlliance()->getGDColor($image));
-                    imageellipse($image, $x, $y, 40, 40, $position->getAlliance()->getGDColor($image));
-//                    imagecopy($image,$logo_immu, $position->getPosX()-50, $position->getPosY()-50, 0,0, 100, 100);
-                    break;
-                default :
-                    for ($i = 1; $i < 5; $i++) {
-                        //icone
-                        imagerectangle($image,$x-$i,$y-$i,$x+$this->largeur+$i,$y+$this->hauteur+$i,$position->getAlliance()->getGDColor($image));
-                        //          imageellipse($image, $position->getPosX(), $position->getPosY(), 60, 60, $position->getAlliance()->getCouleur());
-                        //texte
-                        imagestring($image, 5, $x+$this->largeur*0.85+-15, $y+$this->hauteur/2-10, $position->getAlliance()->getNom(), $position->getAlliance()->getGDColor($image));
+//          $this->addFlash('warning',' x :'.$position->getPosX().' => '.$x);
+            for ($i = 1; $i < 5; $i++) {
+                 //icone
+                 imagerectangle($image,$x+$i,$y+$i,$x+$this->largeur-$i,$y+$this->hauteur-$i,$position->getAlliance()->getGDColor($image));
+                 //          imageellipse($image, $position->getPosX(), $position->getPosY(), 60, 60, $position->getAlliance()->getCouleur());
+                 //texte
+                 imagestring($image, 5, $x+$this->largeur*0.85-18, $y+$this->hauteur/2-20, $position->getAlliance()->getNom(), $position->getAlliance()->getGDColor($image));
 //            imagettftext($image, 20, 0, $position->getPosX()-20, $position->getPosY(), $position->getAlliance()->getGDColor($image),'arial', $position->getAlliance()->getNom());
 
-
-                    }
             }
+            if ($position->getCible()) $this->cible($position);
 
 
 
@@ -375,6 +385,37 @@ class ServeurController extends AbstractController
         return ($y-1)*$this->hauteur;// + $this->ymin;
     }
 
+    private function cible($position){
+        $x = $this->conversionX($position->getPosX());
+        $y = $this->conversionY($position->getPosX(),$position->getPosY());
+        $image = $this->image;
+
+
+//        $logo_immu = imagecreatefrompng('images/immu.png');
+
+        switch ($position->getCible()){
+            case "attaque":
+                $logo_attaque = imagecreatefrompng('images/attaque.png');
+//                $this->resize('images/attaque.png',50, 50);
+                imagecopymerge($image,$logo_attaque, $x+5, $y+5, 0,0, 50, 50,50);
+
+                break;
+            case "défense":
+                $logo_bouclier = imagecreatefrompng('images/bouclier.png');
+//                $this->resize('images/bouclier.png',50, 50);
+                imagecopymerge($image,$logo_bouclier, $x+5, $y+5, 0,0, 50, 50,50);
+                break;
+            case "immunité":
+                imageellipse($image, $x+30, $y+30, 60, 60, $position->getAlliance()->getGDColor($image));
+                imageellipse($image, $x+30, $y+30, 40, 40, $position->getAlliance()->getGDColor($image));
+                imageellipse($image, $x+30, $y+30, 20, 20, $position->getAlliance()->getGDColor($image));
+//                imageellipse($image, $x+30, $y+30, 60, 60, $position->getAlliance()->getGDColor($image));
+
+//                    imagecopy($image,$logo_immu, $position->getPosX()-50, $position->getPosY()-50, 0,0, 100, 100);
+                break;
+        }
+
+    }
     private function remplirVille()
     {
         //VILLE 1
@@ -431,13 +472,13 @@ class ServeurController extends AbstractController
         $this->ville($ville3,16,15);
     }
 
-    private function resize(string $filename): void
+    private function resize(string $filename,$width = 0, $height = 0  ): void
     {
         $imagine = new Imagine();
         list($iwidth, $iheight) = getimagesize($filename);
         $ratio = $iwidth / $iheight;
-        $width = $this->largeur;
-        $height = $this->hauteur;
+        if ($width == 0) $width = $this->largeur;
+        if ($height == 0) $height = $this->hauteur;
         if ($width / $height > $ratio) {
             $width = $height * $ratio;
         } else {
