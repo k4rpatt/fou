@@ -84,16 +84,37 @@ class ServeurController extends AbstractController
                 if ($form->getClickedButton()) {
                     switch ($form->getClickedButton()->getName()){
                         case 'attaque':
-                            $this->addFlash('warning','ATTAQUE !');
-                            $autre_position->setCible('attaque');
+                            if ($autre_position->getCible() == "attaque"){
+                                $autre_position->setCible(null);
+                                $this->addFlash('warning','Suppression de l\'attaque !');
+                            }
+                            else {
+                                $this->addFlash('warning','Planification de l\'attaque !');
+                                $autre_position->setCible('attaque');
+                            }
+
                             break;
                         case 'defense':
-                            $this->addFlash('warning','DEFENSE !');
-                            $autre_position->setCible('défense');
+                            if ($autre_position->getCible() == "défense"){
+                                $autre_position->setCible(null);
+                                $this->addFlash('warning','Suppression de la défense !');
+                            }
+                            else {
+                                $this->addFlash('warning','Planification de la défense !');
+                                $autre_position->setCible('défense');
+                            }
+
                             break;
                         case 'immunite':
-                            $this->addFlash('warning','IMMU !');
-                            $autre_position->setCible('immunité');
+                            if ($autre_position->getCible() == "immunité"){
+                                $autre_position->setCible(null);
+                                $this->addFlash('warning','Suppression de l\'immunité !');
+                            }
+                            else {
+                                $this->addFlash('warning','Planification de l\'immunité !');
+                                $autre_position->setCible('immunité');
+                            }
+                           
                             break;
                         default:
                             if ($position->getAlliance()->getId() == $autre_position->getAlliance()->getId()){

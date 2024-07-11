@@ -28,7 +28,7 @@ class PositionServeurType extends AbstractType
                 ->add("duree", DateIntervalType::class, [
                 'widget'      => 'integer', // render a text field for each part
                 // 'input'    => 'string',  // if you want the field to return a ISO 8601 string back to you
-
+                'required'    => false,
                 // customize which text boxes are shown
                 'with_years'  => false,
                 'with_months' => false,
