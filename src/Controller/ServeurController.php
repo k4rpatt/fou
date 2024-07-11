@@ -114,7 +114,7 @@ class ServeurController extends AbstractController
                                 $this->addFlash('warning','Planification de l\'immunité !');
                                 $autre_position->setCible('immunité');
                             }
-                           
+
                             break;
                         default:
                             if ($position->getAlliance()->getId() == $autre_position->getAlliance()->getId()){
@@ -368,6 +368,7 @@ $today = new \DateTime();
 
 
             }
+            imagefilledrectangle($this->image,9 * $largeur + $xmin, 9 * $hauteur + $ymin,11 * $largeur + $xmin, 11 * $hauteur + $ymin,$colorGrey);
 
         }
 //        return $this->image;
@@ -443,57 +444,107 @@ $today = new \DateTime();
     private function remplirVille()
     {
         //VILLE 1
-        $this->resize('images/ville1.png');
-        $ville1 = imagecreatefrompng('images/ville1.png');
-        for ($x=1; $x<=6; $x++) {
-            $this->ville($ville1,$x*3+1,1);
-            if ($x==6) $this->ville($ville1,20-$x*3+1,20);
-            else $this->ville($ville1,20-$x*3,20);
+//        $this->resize('images/ville1.png');
+//        $this->resize('images/1.PNG');
+        $ville1 = imagecreatefrompng('images/1.PNG');
+        for ($x = 1; $x <= 6; $x++) {
+            $this->ville($ville1, $x * 3 + 1, 1);
+            if ($x == 6) $this->ville($ville1, 20 - $x * 3 + 1, 20);
+            else $this->ville($ville1, 20 - $x * 3, 20);
         }
 
-        for ($y=1; $y<=6; $y++) {
-            $this->ville($ville1,1,$y*3+1);
-            $this->ville($ville1,20,$y*3);
+        for ($y = 1; $y <= 6; $y++) {
+            $this->ville($ville1, 1, $y * 3 + 1);
+            $this->ville($ville1, 20, $y * 3);
         }
 
         //Ville 2
-        $this->resize('images/ville2.png');
-        $ville2 = imagecreatefrompng('images/ville2.png');
-        for ($x=0; $x<6; $x++) {
-            $this->ville($ville2,$x*2+5,3);
-            $this->ville($ville2,$x*2+5,18);
-            if ($x==2) $x++;
+        $this->resize('images/2.PNG');
+        $ville2 = imagecreatefrompng('images/2.PNG');
+//        $ville2 = imagecreatefrompng('images/ville2.png');
+        for ($x = 0; $x < 6; $x++) {
+            $this->ville($ville2, $x * 2 + 5, 3);
+            $this->ville($ville2, $x * 2 + 5, 18);
+            if ($x == 2) $x++;
         }
 
-        for ($y=0; $y<5; $y++) {
-            $this->ville($ville2,3,$y*3+4);
-            $this->ville($ville2,18,$y*3+4);
+        for ($y = 0; $y < 5; $y++) {
+            $this->ville($ville2, 3, $y * 3 + 4);
+            $this->ville($ville2, 18, $y * 3 + 4);
         }
 
         //Ville 3
-        $this->resize('images/ville3.png');
-        $ville3 = imagecreatefrompng('images/ville3.png');
+//        $this->resize('images/ville3.png');
+//        $ville3 = imagecreatefrompng('images/ville3.png');
+        $this->resize('images/3.PNG');
+        $ville3 = imagecreatefrompng('images/3.PNG');
 
 
-        $this->ville($ville3,8,4);
-        $this->ville($ville3,10,4);
-        $this->ville($ville3,12,4);
-        $this->ville($ville3,14,4);
+        $this->ville($ville3, 8, 4);
+        $this->ville($ville3, 10, 4);
+        $this->ville($ville3, 12, 4);
+        $this->ville($ville3, 14, 4);
 
-        $this->ville($ville3,8,16);
-        $this->ville($ville3,10,16);
-        $this->ville($ville3,12,16);
-        $this->ville($ville3,14,16);
+        $this->ville($ville3, 8, 16);
+        $this->ville($ville3, 10, 16);
+        $this->ville($ville3, 12, 16);
+        $this->ville($ville3, 14, 16);
 
-        $this->ville($ville3,5,5);
-        $this->ville($ville3,5,8);
-        $this->ville($ville3,5,12);
-        $this->ville($ville3,5,15);
+        $this->ville($ville3, 5, 5);
+        $this->ville($ville3, 5, 8);
+        $this->ville($ville3, 5, 12);
+        $this->ville($ville3, 5, 15);
 
-        $this->ville($ville3,16,5);
-        $this->ville($ville3,16,8);
-        $this->ville($ville3,16,12);
-        $this->ville($ville3,16,15);
+        $this->ville($ville3, 16, 5);
+        $this->ville($ville3, 16, 8);
+        $this->ville($ville3, 16, 12);
+        $this->ville($ville3, 16, 15);
+
+
+        //Ville 4
+        $this->resize('images/4.PNG');
+        $ville4 = imagecreatefrompng('images/4.PNG');
+
+        $this->ville($ville4, 9, 6);
+        $this->ville($ville4, 11, 6);
+        $this->ville($ville4, 13, 6);
+
+        $this->ville($ville4, 9, 15);
+        $this->ville($ville4, 11, 15);
+        $this->ville($ville4, 13, 15);
+
+        $this->ville($ville4, 7, 7);
+        $this->ville($ville4, 7, 9);
+        $this->ville($ville4, 7, 13);
+
+        $this->ville($ville4, 14, 7);
+        $this->ville($ville4, 14, 9);
+        $this->ville($ville4, 14, 13);
+
+        //Ville 5
+        $this->resize('images/5.PNG');
+        $ville5 = imagecreatefrompng('images/5.PNG');
+
+        $this->ville($ville5, 9, 8);
+        $this->ville($ville5, 8, 11);
+        $this->ville($ville5, 12, 7);
+        $this->ville($ville5, 13, 12);
+        $this->ville($ville5, 10, 13);
+
+        //Ville 6
+        $this->resize('images/6.PNG');
+        $ville5 = imagecreatefrompng('images/6.PNG');
+
+        $this->ville($ville5, 12, 9);
+        $this->ville($ville5, 9, 10);
+        $this->ville($ville5, 11, 12);
+
+        $this->resize('images/7.PNG');
+        $ville7 = imagecreatefrompng('images/7.PNG');
+        $sx = imagesx($ville7);
+        $sy = imagesy($ville7);
+        imagecopymerge($this->image, $ville7, $this->conversionX(10)+$this->largeur/2 +$sx/2 , $this->conversionY(10,10) , 0, 0, $sx, $sy, 75);
+
     }
 
     private function resize(string $filename,$width = 0, $height = 0  ): void
