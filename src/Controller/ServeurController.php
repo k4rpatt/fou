@@ -67,6 +67,7 @@ class ServeurController extends AbstractController
     public function show(Request $request,Serveur $serveur, EntityManagerInterface $entityManager, PositionRepository $positionRepository): Response
     {
         $position = new Position();
+//        $position->setMoment();
         $position->setServeur($serveur);
         $form = $this->createForm(PositionServeurType::class, $position);
         $form
@@ -171,7 +172,7 @@ class ServeurController extends AbstractController
 //        $image = $imagine->open('images/Season1.png');
 //        $image = imagecreatefrompng('images/Season1.png');
         $this->makemapvierge();
-
+$today = new \DateTime();
         //imagescale($image,800);
         $image = $this->image;
         foreach ($serveur->getPositions() as $position)
@@ -185,6 +186,8 @@ class ServeurController extends AbstractController
                  //          imageellipse($image, $position->getPosX(), $position->getPosY(), 60, 60, $position->getAlliance()->getCouleur());
                  //texte
                  imagestring($image, 5, $x+$this->largeur*0.85-18, $y+$this->hauteur/2-20, $position->getAlliance()->getNom(), $position->getAlliance()->getGDColor($image));
+                 if ($position->getMoment())
+                 imagestring($image, 2, $x+$this->largeur*0.85-30, $y+$this->hauteur/2+10, $position->getMoment()->diff($today)->format("%dj%Hh%I"), imagecolorallocate($image, 255, 0, 0));
 //            imagettftext($image, 20, 0, $position->getPosX()-20, $position->getPosY(), $position->getAlliance()->getGDColor($image),'arial', $position->getAlliance()->getNom());
 
             }

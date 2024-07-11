@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\PositionRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PositionRepository::class)]
@@ -30,6 +31,32 @@ class Position
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $cible = null;
 
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $moment = null;
+
+    private \DateInterval $duree;
+
+    /**
+     * @return null
+     */
+    public function getDuree()
+    {
+        return $this->duree;
+    }
+
+    /**
+     * @param null $duree
+     */
+    public function setDuree($duree): void
+    {
+        $today = new \DateTime();
+
+        $this->setMoment($today->add($duree));
+        $this->duree = $duree;
+    }
+
+
+    
     public function getId(): ?int
     {
         return $this->id;
@@ -96,6 +123,18 @@ class Position
     public function setCible(?string $cible): static
     {
         $this->cible = $cible;
+
+        return $this;
+    }
+
+    public function getMoment(): ?\DateTimeInterface
+    {
+        return $this->moment;
+    }
+
+    public function setMoment(?\DateTimeInterface $moment): static
+    {
+        $this->moment = $moment;
 
         return $this;
     }
