@@ -44,7 +44,7 @@ class PositionServeurType extends AbstractType
             ] )
             ->add('alliance', EntityType::class, [
                 'class' => Alliance::class,
-                'choice_label' => 'nom',
+//                'choice_label' => 'nom',
             ])
 //            ->add('serveur', EntityType::class, [
 //                'class' => Serveur::class,

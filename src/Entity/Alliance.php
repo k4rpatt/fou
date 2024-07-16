@@ -118,6 +118,6 @@ class Alliance
 
     public function __toString(): string
     {
-        return $this->getNom();
+        return "#".$this->getServeur()."-".$this->getNom();
     }
 }
