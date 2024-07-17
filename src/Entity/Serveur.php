@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\ServeurRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ServeurRepository::class)]
@@ -30,10 +31,13 @@ class Serveur
     #[ORM\OneToMany(targetEntity: Position::class, mappedBy: 'serveur', orphanRemoval: true)]
     private Collection $positions;
 
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $debut = null;
+
 
     public function __toString()
     {
-        return $this->getNumero();
+        return $this->getNumero()."";
     }
     public function __construct()
     {
@@ -114,6 +118,20 @@ class Serveur
                 $position->setServeur(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getDebut(): ?\DateTimeInterface
+    {
+//        if (!$this->getDebut()) $this->debut = new \DateTime();
+        $this->debut->add(\DateInterval::createFromDateString('4 hours'));
+        return $this->debut;
+    }
+
+    public function setDebut(\DateTimeInterface $debut): static
+    {
+        $this->debut = $debut;
 
         return $this;
     }

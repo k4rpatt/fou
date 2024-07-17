@@ -47,6 +47,7 @@ class ServeurController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $serveur = new Serveur();
+        $serveur->setDebut(new \DateTime());
         $form = $this->createForm(ServeurType::class, $serveur);
         $form->handleRequest($request);
 
@@ -68,77 +69,107 @@ class ServeurController extends AbstractController
     {
         $position = new Position();
 //        $position->setMoment();
+        $position->setDuree(\DateInterval::createFromDateString('0 day'));
         $position->setServeur($serveur);
         $form = $this->createForm(PositionServeurType::class, $position);
         $form
-            ->add('maj', SubmitType::class, ['label' => 'Mise à jour proprio', 'attr' => ['class' => 'btn btn-success']])
+//SUIVI
+            ->add('ajout', SubmitType::class, ['label' => 'Nouvelle capture', 'attr' => ['class' => 'btn btn-success']])
+            ->add('maj', SubmitType::class, ['label' => 'Mise à jour position', 'attr' => ['class' => 'btn btn-primary']])
+            ->add('suppr', SubmitType::class, ['label' => 'Supprimer position', 'attr' => ['class' => 'btn btn-danger']])
+//STRATEGIE
             ->add('attaque', SubmitType::class, ['label' => 'attaque', 'attr' => ['class' => 'btn btn-danger']])
             ->add('defense', SubmitType::class, ['label' => 'défense', 'attr' => ['class' => 'btn btn-warning']])
             ->add('immunite', SubmitType::class, ['label' => 'immunité', 'attr' => ['class' => 'btn btn-primary']]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $autre_position = $positionRepository->findOneByPosition($position);
-            if ($autre_position) {
-//                $this->addFlash('warning', 'cette position est déjà attribuée');
-                if ($form->getClickedButton()) {
-                    switch ($form->getClickedButton()->getName()){
-                        case 'attaque':
-                            if ($autre_position->getCible() == "attaque"){
-                                $autre_position->setCible(null);
-                                $this->addFlash('warning','Suppression de l\'attaque !');
-                            }
-                            else {
-                                $this->addFlash('warning','Planification de l\'attaque !');
-                                $autre_position->setCible('attaque');
-                            }
+            if ($form->getClickedButton()) {
+                $action = $form->getClickedButton()->getName();
+                $autre_position = $positionRepository->findDernierePositionv2($position->getPosX(),$position->getPosY());
 
-                            break;
-                        case 'defense':
-                            if ($autre_position->getCible() == "défense"){
-                                $autre_position->setCible(null);
-                                $this->addFlash('warning','Suppression de la défense !');
-                            }
-                            else {
-                                $this->addFlash('warning','Planification de la défense !');
-                                $autre_position->setCible('défense');
-                            }
+                switch ($action){
+                    //suivi
+                    case 'ajout': //on a une nouvelle position
+                        $dateCapture = new \DateTime('now');
+                        if (!$position->getDuree()) $this->addFlash('warning','pas de données sur le bouclier');
+                        else $dateCapture->sub($position->getDuree());
+                        $position->setMoment($dateCapture);
+                        $entityManager->persist($position);
+                        $this->addFlash('info','Ajout de la position : alliance'.$position->getAlliance()." a pris le controle de ".$position." a la date du ".$position->getMoment()->format("d/m/y H:i"));
+                        break;
+                    case 'ajout': //on a une nouvelle position
+                        $entityManager->remove($position);
+                        $this->addFlash('danger', 'Suppression de la position');
+                        break;
+                    case 'maj':
+                        $autre_position->setAlliance($position->getAlliance());
+                        $this->addFlash('warning','Changement d\'alliance !');
+                        break;
+                    //Stratégie, on met à jour la position existante
+                    case 'attaque':
+                        if ($autre_position->getCible() == "attaque"){
+                            $autre_position->setCible(null);
+                            $this->addFlash('warning','Suppression de l\'attaque !');
+                        }
+                        else {
+                            $this->addFlash('warning','Planification de l\'attaque !');
+                            $autre_position->setCible('attaque');
+                        }
 
-                            break;
-                        case 'immunite':
-                            if ($autre_position->getCible() == "immunité"){
-                                $autre_position->setCible(null);
-                                $this->addFlash('warning','Suppression de l\'immunité !');
-                            }
-                            else {
-                                $this->addFlash('warning','Planification de l\'immunité !');
-                                $autre_position->setCible('immunité');
-                            }
+                        break;
+                    case 'defense':
+                        if ($autre_position->getCible() == "défense"){
+                            $autre_position->setCible(null);
+                            $this->addFlash('warning','Suppression de la défense !');
+                        }
+                        else {
+                            $this->addFlash('warning','Planification de la défense !');
+                            $autre_position->setCible('défense');
+                        }
 
-                            break;
-                        default:
-                            if ($position->getAlliance()->getId() == $autre_position->getAlliance()->getId()){
-                                $entityManager->remove($autre_position);
-                                $this->addFlash('danger', 'Suppression de la position');
-                            }
-                            else {
-                                $autre_position->setAlliance($position->getAlliance());
-                                $this->addFlash('warning','Changement d\'alliance !');
-                            }
-                    }
+                        break;
+                    case 'immunite':
+                        if ($autre_position->getCible() == "immunité"){
+                            $autre_position->setCible(null);
+                            $this->addFlash('warning','Suppression de l\'immunité !');
+                        }
+                        else {
+                            $this->addFlash('warning','Planification de l\'immunité !');
+                            $autre_position->setCible('immunité');
+                        }
+
+                        break;
+
+                    default:
+                        if ($position->getAlliance()->getId() == $autre_position->getAlliance()->getId()){
+                            $entityManager->remove($autre_position);
+                            $this->addFlash('danger', 'Suppression de la position');
+                        }
+                        else {
+                            $autre_position->setAlliance($position->getAlliance());
+                            $this->addFlash('warning','Changement d\'alliance !');
+                        }
                 }
-                else {
-                    $this->addFlash('warning','clic non detecté !');
-
-                }
-
-
             }
             else {
-                $entityManager->persist($position);
+                $this->addFlash('warning','clic non detecté !');
 
-                $this->addFlash('info','Ajout de la position');
             }
+
+//            if ($autre_position) {
+////                $this->addFlash('warning', 'cette position est déjà attribuée');
+//
+//
+//
+//            }
+//            else {
+//                //Nouvelle position
+//
+//                $entityManager->persist($position);
+//                $this->addFlash('info','Ajout de la position');
+//
+//            }
             $entityManager->flush();
 //
 //            return $this->redirectToRoute('app_position_index', [], Response::HTTP_SEE_OTHER);
@@ -172,20 +203,22 @@ class ServeurController extends AbstractController
         ]);
     }
 
-    #[Route('/{numero}', name: 'app_serveur_delete', methods: ['POST'])]
+    #[Route('/{numero}/delete', name: 'app_serveur_delete', methods: ['POST'])]
     public function delete(Request $request, Serveur $serveur, EntityManagerInterface $entityManager): Response
     {
+//        $this->addFlash('info','tentative de suppression');
         if ($this->isCsrfTokenValid('delete'.$serveur->getId(), $request->getPayload()->getString('_token'))) {
+            $this->addFlash('danger','suppression du serveur !')    ;
             $entityManager->remove($serveur);
             $entityManager->flush();
         }
-
+        else $this->addFlash('warning','erreur CSRF, pas de suppression');
         return $this->redirectToRoute('app_serveur_index', [], Response::HTTP_SEE_OTHER);
     }
 
 
     #[Route('/{numero}/map', name: 'app_serveur_map', methods: ['GET'])]
-    public function map(Serveur $serveur, LoggerInterface $logger): Response
+    public function map(Serveur $serveur,PositionRepository $positionRepository, LoggerInterface $logger): Response
     {
         $imagine = new Imagine();
 
@@ -193,30 +226,64 @@ class ServeurController extends AbstractController
 //        $image = $imagine->open('images/Season1.png');
 //        $image = imagecreatefrompng('images/Season1.png');
         $this->makemapvierge();
-$today = new \DateTime();
+$today = new \DateTime('now');
         //imagescale($image,800);
         $image = $this->image;
-        foreach ($serveur->getPositions() as $position)
-        {
-            $x = $this->conversionX($position->getPosX());
-            $y = $this->conversionY($position->getPosX(),$position->getPosY());
+        for ($ligne = 1; $ligne < 21; $ligne++) {
+            for ($colonne = 1; $colonne < 21; $colonne++) {
+//                findDernierePositionv2
+                $position= $positionRepository->findDernierePositionv2($colonne, $ligne);
+                if ($position) {
+                    $x = $this->conversionX($position->getPosX());
+                    $y = $this->conversionY($position->getPosX(),$position->getPosY());
 //          $this->addFlash('warning',' x :'.$position->getPosX().' => '.$x);
-            for ($i = 1; $i < 5; $i++) {
-                 //icone
-                 imagerectangle($image,$x+$i,$y+$i,$x+$this->largeur-$i,$y+$this->hauteur-$i,$position->getAlliance()->getGDColor($image));
-                 //          imageellipse($image, $position->getPosX(), $position->getPosY(), 60, 60, $position->getAlliance()->getCouleur());
-                 //texte
-                 imagestring($image, 5, $x+$this->largeur*0.85-18, $y+$this->hauteur/2-20, $position->getAlliance()->getNom(), $position->getAlliance()->getGDColor($image));
-                 if ($position->getMoment())
-                 imagestring($image, 2, $x+$this->largeur*0.85-30, $y+$this->hauteur/2+10, $position->getMoment()->diff($today)->format("%dj%Hh%I"), imagecolorallocate($image, 255, 0, 0));
+                    for ($i = 1; $i < 5; $i++) {
+                        //icone
+                        imagerectangle($image,$x+$i,$y+$i,$x+$this->largeur-$i,$y+$this->hauteur-$i,$position->getAlliance()->getGDColor($image));
+                        //          imageellipse($image, $position->getPosX(), $position->getPosY(), 60, 60, $position->getAlliance()->getCouleur());
+                        //texte
+                        imagestring($image, 5, $x+$this->largeur*0.85-18, $y+$this->hauteur/2-20, $position->getAlliance()->getNom(), $position->getAlliance()->getGDColor($image));
+                        if ($position->getMoment()){
+                          $ecart = $position->getMoment()->diff($today);
+                           if ($ecart->invert == 1)    $temps = $ecart->format("%dj%Hh%I");
+                            else $temps ="";
+                            imagestring($image, 2, $x+$this->largeur*0.85-30, $y+$this->hauteur/2+10, $temps, imagecolorallocate($image, 255, 0, 0));
+                        }
+
 //            imagettftext($image, 20, 0, $position->getPosX()-20, $position->getPosY(), $position->getAlliance()->getGDColor($image),'arial', $position->getAlliance()->getNom());
 
+                    }
+                    if ($position->getCible()) $this->cible($position);
+                }
+
             }
-            if ($position->getCible()) $this->cible($position);
-
-
-
         }
+//        foreach ($serveur->getPositions() as $position)
+//        {
+//            $x = $this->conversionX($position->getPosX());
+//            $y = $this->conversionY($position->getPosX(),$position->getPosY());
+////          $this->addFlash('warning',' x :'.$position->getPosX().' => '.$x);
+//            for ($i = 1; $i < 5; $i++) {
+//                 //icone
+//                 imagerectangle($image,$x+$i,$y+$i,$x+$this->largeur-$i,$y+$this->hauteur-$i,$position->getAlliance()->getGDColor($image));
+//                 //          imageellipse($image, $position->getPosX(), $position->getPosY(), 60, 60, $position->getAlliance()->getCouleur());
+//                 //texte
+//                 imagestring($image, 5, $x+$this->largeur*0.85-18, $y+$this->hauteur/2-20, $position->getAlliance()->getNom(), $position->getAlliance()->getGDColor($image));
+//                 if ($position->getMoment()){
+//
+//                    if ($position->getMoment() > $today )$temps = $position->getMoment()->diff($today)->format("%dj%Hh%I");
+//                    else $temps ="";
+//                    imagestring($image, 2, $x+$this->largeur*0.85-30, $y+$this->hauteur/2+10, $temps, imagecolorallocate($image, 255, 0, 0));
+//                 }
+//
+////            imagettftext($image, 20, 0, $position->getPosX()-20, $position->getPosY(), $position->getAlliance()->getGDColor($image),'arial', $position->getAlliance()->getNom());
+//
+//            }
+//            if ($position->getCible()) $this->cible($position);
+//
+//
+//
+//        }
 
        //imagepng($image,'images/'.$serveur->getNumero().'.png');
 //        $image ->save('images/'.$serveur->getNumero().'.png');
@@ -234,6 +301,7 @@ $today = new \DateTime();
     {
         $alliance = new Alliance();
         $alliance->setServeur($serveur);
+
         $form = $this->createForm(AllianceType::class, $alliance);
         $form->handleRequest($request);
 

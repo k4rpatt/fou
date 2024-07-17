@@ -12,6 +12,7 @@
                 <th>Alliance</th>
                 <th>PosX</th>
                 <th>PosY</th>
+                <th>Jour</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -23,6 +24,7 @@
                 <td>{{ position.alliance }}</td>
                 <td>{{ position.posX }}</td>
                 <td>{{ position.posY }}</td>
+                <td>{{ position.moment|date('d/m/Y H:i') }}(day {{ position.jour }})</td>
                 <td>
                     <a href="{{ path('app_position_show', {'id': position.id}) }}">show</a>
                     <a href="{{ path('app_position_edit', {'id': position.id}) }}">edit</a>

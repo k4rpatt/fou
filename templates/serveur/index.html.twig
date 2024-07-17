@@ -9,6 +9,7 @@
             <tr>
                 <th>Id</th>
                 <th>Numero</th>
+                <th>Début</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -18,10 +19,11 @@
             <tr>
                 <td>{{ serveur.id }}</td>
                 <td>{{ serveur.numero }}</td>
+                <td>{{ serveur.debut|date('d/m/Y H:i') }}</td>
                 <td>
                     <a href="{{ path('app_serveur_show', {'numero': serveur.numero}) }}" ><i class="fa-solid fa-eye"></i></a>
                     <a href="{{ path('app_serveur_map', {'numero': serveur.numero}) }}" ><i class="fa-solid fa-map"></i></a>
-{#                    <a href="{{ path('app_serveur_edit', {'id': serveur.id}) }}"><i class="fa-regular fa-pen-to-square"></i></a>#}
+                    <a href="{{ path('app_serveur_edit', {'numero': serveur.numero}) }}"><i class="fa-regular fa-pen-to-square"></i></a>
                 </td>
             </tr>
         {% else %}

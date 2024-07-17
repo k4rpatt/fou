@@ -36,11 +36,17 @@ class Position
 
     private \DateInterval $duree;
 
+    public function __construct()
+    {
+        $this->duree = \DateInterval::createFromDateString('0 days');
+    }
+
     /**
      * @return null
      */
     public function getDuree()
     {
+//        if (!$this->duree)  return  \DateInterval::createFromDateString('0 days');
         return $this->duree;
     }
 
@@ -115,6 +121,7 @@ class Position
         return "(".$this->getPosX().";".$this->getPosY().")";
     }
 
+
     public function getCible(): ?string
     {
         return $this->cible;
@@ -138,4 +145,12 @@ class Position
 
         return $this;
     }
+
+    public function getJour()
+    {
+//        return $this->getMoment()->diff($this->getServeur()->getDebut())->format('%dj%hh%imin');
+        return $this->getMoment()->diff($this->getServeur()->getDebut())->days;
+    }
+
+
 }
