@@ -26,9 +26,18 @@
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav">
                         <li class="nav-item active">
-                            <a class="nav-link" href="{{ path('app_serveur_index') }}">Serveur <span class="sr-only">(current)</span></a>
+                            <a class="nav-link" href="{{ path('app_serveur_index') }}">Gestion Serveurs <span class="sr-only">(current)</span></a>
                         </li>
-
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Gestion Alliance
+                            </a>
+                            <ul class="dropdown-menu">
+                                <a class="nav-link" href="{{ path('app_joueur_index') }}">Joueurs</a>
+                                <a class="nav-link" href="{{ path('app_train_index') }}">Trains</a>
+                                {#                                <li><a class="dropdown-item" href="#">Something else here</a></li>#}
+                            </ul>
+                        </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 configuration

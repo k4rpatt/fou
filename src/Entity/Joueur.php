@@ -12,6 +12,8 @@
 namespace App\Entity;
 
 use App\Repository\JoueurRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: JoueurRepository::class)]
@@ -42,6 +44,24 @@ class Joueur
 
     #[ORM\Column(nullable: true)]
     private ?float $PC_equipe4 = null;
+
+    /**
+     * @var Collection<int, Train>
+     */
+    #[ORM\OneToMany(targetEntity: Train::class, mappedBy: 'conducteur')]
+    private Collection $trains;
+
+    /**
+     * @var Collection<int, Train>
+     */
+    #[ORM\OneToMany(targetEntity: Train::class, mappedBy: 'passager1')]
+    private Collection $passagers;
+
+    public function __construct()
+    {
+        $this->trains = new ArrayCollection();
+        $this->passagers = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -128,6 +148,66 @@ class Joueur
     public function setPCEquipe4(?float $PC_equipe4): static
     {
         $this->PC_equipe4 = $PC_equipe4;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Train>
+     */
+    public function getTrains(): Collection
+    {
+        return $this->trains;
+    }
+
+    public function addTrain(Train $train): static
+    {
+        if (!$this->trains->contains($train)) {
+            $this->trains->add($train);
+            $train->setConducteur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTrain(Train $train): static
+    {
+        if ($this->trains->removeElement($train)) {
+            // set the owning side to null (unless already changed)
+            if ($train->getConducteur() === $this) {
+                $train->setConducteur(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Train>
+     */
+    public function getPassagers(): Collection
+    {
+        return $this->passagers;
+    }
+
+    public function addPassager(Train $passager): static
+    {
+        if (!$this->passagers->contains($passager)) {
+            $this->passagers->add($passager);
+            $passager->setPassager1($this);
+        }
+
+        return $this;
+    }
+
+    public function removePassager(Train $passager): static
+    {
+        if ($this->passagers->removeElement($passager)) {
+            // set the owning side to null (unless already changed)
+            if ($passager->getPassager1() === $this) {
+                $passager->setPassager1(null);
+            }
+        }
 
         return $this;
     }

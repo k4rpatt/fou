@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Train index{% endblock %}
+
+{% block body %}
+    <h1>Train index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Depart</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for train in trains %}
+            <tr>
+                <td>{{ train.id }}</td>
+                <td>{{ train.depart ? train.depart|date('Y-m-d') : '' }}</td>
+                <td>
+                    <a href="{{ path('app_train_show', {'id': train.id}) }}">show</a>
+                    <a href="{{ path('app_train_edit', {'id': train.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_train_new') }}">Create new</a>
+{% endblock %}

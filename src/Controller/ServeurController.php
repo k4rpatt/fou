@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/')]
+#[Route('/serveur')]
 class ServeurController extends AbstractController
 {
     private $largeur = 90;
@@ -104,7 +104,11 @@ class ServeurController extends AbstractController
                         break;
                     case 'maj':
                         $autre_position->setAlliance($position->getAlliance());
-                        $this->addFlash('warning','Changement d\'alliance !');
+                        $dateCapture = new \DateTime('now');
+                        if (!$position->getDuree()) $this->addFlash('warning','pas de données sur le bouclier');
+                        else $dateCapture->add($position->getDuree());
+                        $autre_position->setMoment($dateCapture);
+                        $this->addFlash('warning','Mise à jour!');
                         break;
                     //Stratégie, on met à jour la position existante
                     case 'attaque':
