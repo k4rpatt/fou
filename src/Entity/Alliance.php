@@ -31,6 +31,9 @@ class Alliance
     #[ORM\OneToMany(targetEntity: Position::class, mappedBy: 'alliance')]
     private Collection $positions;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $zone = null;
+
     public function __construct()
     {
         $this->positions = new ArrayCollection();
@@ -119,5 +122,17 @@ class Alliance
     public function __toString(): string
     {
         return "#".$this->getServeur()."-".$this->getNom();
+    }
+
+    public function getZone(): ?string
+    {
+        return $this->zone;
+    }
+
+    public function setZone(string $zone): static
+    {
+        $this->zone = $zone;
+
+        return $this;
     }
 }

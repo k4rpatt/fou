@@ -19,6 +19,7 @@ class JoueurType extends AbstractType
             ->add('PC_equipe2')
             ->add('PC_equipe3')
             ->add('PC_equipe4')
+            ->add('resistance')
         ;
     }
 

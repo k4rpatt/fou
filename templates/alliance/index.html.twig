@@ -10,6 +10,7 @@
             <tr>
                 <th>Id</th>
                 <th>Nom</th>
+                <th>Zone</th>
                 <th>Couleur</th>
                 <th>actions</th>
             </tr>
@@ -19,6 +20,7 @@
             <tr>
                 <td>{{ alliance.id }}</td>
                 <td>#{{ alliance.serveur }} - {{ alliance.nom }}</td>
+                <td>{{ alliance.zone }}</td>
                 <td>{{ alliance.couleur }}</td>
                 <td>
                     <a href="{{ path('app_alliance_show', {'id': alliance.id}) }}">show</a>

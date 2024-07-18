@@ -16,6 +16,7 @@
                 <th>PC_equipe2</th>
                 <th>PC_equipe3</th>
                 <th>PC_equipe4</th>
+                <th>Resistance</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -30,6 +31,7 @@
                 <td>{{ joueur.PCEquipe2 }}</td>
                 <td>{{ joueur.PCEquipe3 }}</td>
                 <td>{{ joueur.PCEquipe4 }}</td>
+                <td>{{ joueur.resistance }}</td>
                 <td>
                     <a href="{{ path('app_joueur_show', {'id': joueur.id}) }}">show</a>
                     <a href="{{ path('app_joueur_edit', {'id': joueur.id}) }}">edit</a>

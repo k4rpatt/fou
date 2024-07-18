@@ -57,6 +57,9 @@ class Joueur
     #[ORM\OneToMany(targetEntity: Train::class, mappedBy: 'passager1')]
     private Collection $passagers;
 
+    #[ORM\Column(nullable: true)]
+    private ?float $Resistance = null;
+
     public function __construct()
     {
         $this->trains = new ArrayCollection();
@@ -208,6 +211,18 @@ class Joueur
                 $passager->setPassager1(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getResistance(): ?float
+    {
+        return $this->Resistance;
+    }
+
+    public function setResistance(float $Resistance): static
+    {
+        $this->Resistance = $Resistance;
 
         return $this;
     }
