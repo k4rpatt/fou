@@ -12,6 +12,7 @@ use App\Form\PositionType;
 use App\Form\ServeurType;
 use App\Repository\PositionRepository;
 use App\Repository\ServeurRepository;
+use DateInterval;
 use Doctrine\ORM\EntityManagerInterface;
 use Imagine\Gd\Imagine;
 use Imagine\Image\Box;
@@ -33,7 +34,15 @@ class ServeurController extends AbstractController
     private $xmax = 90*20;
     private $ymax = 60*20;
 
+    private \DateInterval $duree_immunite;
+
     private $image;
+
+    public function __construct()
+    {
+        $this->duree_immunite = DateInterval::createFromDateString('36 hour');
+    }
+
 
     #[Route('/', name: 'app_serveur_index', methods: ['GET'])]
     public function index(ServeurRepository $serveurRepository): Response
@@ -93,13 +102,17 @@ class ServeurController extends AbstractController
                     case 'ajout': //on a une nouvelle position
                         $dateCapture = new \DateTime('now');
                         if (!$position->getDuree()) $this->addFlash('warning','pas de données sur le bouclier');
-                        else $dateCapture->sub($position->getDuree());
+                        else {
+                            $dateCapture->add($position->getDuree());
+                            $dateCapture->sub($this->duree_immunite);
+                        }
                         $position->setMoment($dateCapture);
                         $entityManager->persist($position);
-                        $this->addFlash('info','Ajout de la position : alliance'.$position->getAlliance()." a pris le controle de ".$position." a la date du ".$position->getMoment()->format("d/m/y H:i"));
+                        $this->addFlash('info','Ajout de la position : alliance'.$position->getAlliance().
+                            " a pris le controle de ".$position." a la date du ".$position->getMoment()->format("d/m/y H:i"));
                         break;
-                    case 'ajout': //on a une nouvelle position
-                        $entityManager->remove($position);
+                    case 'suppr': //on a une nouvelle position
+                        $entityManager->remove($autre_position);
                         $this->addFlash('danger', 'Suppression de la position');
                         break;
                     case 'maj':
@@ -230,7 +243,8 @@ class ServeurController extends AbstractController
 //        $image = $imagine->open('images/Season1.png');
 //        $image = imagecreatefrompng('images/Season1.png');
         $this->makemapvierge();
-$today = new \DateTime('now');
+        $today = new \DateTime('now');
+        $today->sub($this->duree_immunite);
         //imagescale($image,800);
         $image = $this->image;
         for ($ligne = 1; $ligne < 21; $ligne++) {
@@ -248,8 +262,11 @@ $today = new \DateTime('now');
                         //texte
                         imagestring($image, 5, $x+$this->largeur*0.85-18, $y+$this->hauteur/2-20, $position->getAlliance()->getNom(), $position->getAlliance()->getGDColor($image));
                         if ($position->getMoment()){
-                          $ecart = $position->getMoment()->diff($today);
-                           if ($ecart->invert == 1)    $temps = $ecart->format("%dj%Hh%I");
+//                            $dateCapture->add($position->getDuree());
+//                            $dateCapture->sub($this->duree_immunite);
+
+                                $ecart = $today->diff($position->getMoment());
+                           if ($ecart->invert != 1)    $temps = $ecart->format("%dj%Hh%I");
                             else $temps ="";
                             imagestring($image, 2, $x+$this->largeur*0.85-30, $y+$this->hauteur/2+10, $temps, imagecolorallocate($image, 255, 0, 0));
                         }
