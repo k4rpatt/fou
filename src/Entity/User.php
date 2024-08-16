@@ -13,6 +13,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[UniqueEntity(fields: ['username'], message: 'There is already an account with this username')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    final public const ROLE_USER = 'ROLE_USER';
+    final public const ROLE_AMBASSADEUR = 'ROLE_AMBASSADEUR';
+    final public const ROLE_OFFICIER = 'ROLE_OFFICIER';
+    final public const ROLE_ADMIN = 'ROLE_ADMIN';
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -32,6 +36,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     private ?string $password = null;
+
+    #[ORM\OneToOne(inversedBy: 'user', cascade: ['persist', 'remove'])]
+    private ?Joueur $joueur = null;
 
     public function getId(): ?int
     {
@@ -106,5 +113,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    public function getJoueur(): ?Joueur
+    {
+        return $this->joueur;
+    }
+
+    public function setJoueur(?Joueur $joueur): static
+    {
+        $this->joueur = $joueur;
+
+        return $this;
     }
 }

@@ -7,10 +7,10 @@
 
     <table class="table">
         <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ joueur.id }}</td>
-            </tr>
+{#            <tr>#}
+{#                <th>Id</th>#}
+{#                <td>{{ joueur.id }}</td>#}
+{#            </tr>#}
             <tr>
                 <th>Nom</th>
                 <td>{{ joueur.nom }}</td>
@@ -39,12 +39,18 @@
                 <th>PC_equipe4</th>
                 <td>{{ joueur.PCEquipe4 }}</td>
             </tr>
+            <tr>
+                <th>Résistance</th>
+                <td>{{ joueur.resistance }}</td>
+            </tr>
         </tbody>
     </table>
 
-    <a href="{{ path('app_joueur_index') }}">back to list</a>
 
-    <a href="{{ path('app_joueur_edit', {'id': joueur.id}) }}">edit</a>
 
-    {{ include('joueur/_delete_form.html.twig') }}
+    <a href="{{ path('app_joueur_edit', {'id': joueur.id}) }}" class="btn btn-warning">Modifier</a>
+    {% if is_granted('ROLE_OFFICIER') %}
+        <a href="{{ path('app_joueur_index') }}" class="btn btn-primary">Retour à la liste</a>
+        {{ include('joueur/_delete_form.html.twig') }}
+    {% endif %}
 {% endblock %}

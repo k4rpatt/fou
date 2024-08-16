@@ -3,11 +3,12 @@
 {% block title %}Edit Joueur{% endblock %}
 
 {% block body %}
-    <h1>Edit Joueur</h1>
+    <h1>Modifier le Joueur {{ joueur.nom }}</h1>
 
-    {{ include('joueur/_form.html.twig', {'button_label': 'Update'}) }}
+    {{ include('joueur/_form.html.twig', {'button_label': 'Modifier'}) }}
 
-    <a href="{{ path('app_joueur_index') }}">back to list</a>
-
-    {{ include('joueur/_delete_form.html.twig') }}
+    {% if is_granted('ROLE_OFFICIER') %}
+        <a href="{{ path('app_joueur_index') }}" class="btn btn-primary">Retour à la liste</a>
+        {{ include('joueur/_delete_form.html.twig') }}
+    {% endif %}
 {% endblock %}

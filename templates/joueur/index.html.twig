@@ -33,8 +33,8 @@
                 <td>{{ joueur.PCEquipe4 }}</td>
                 <td>{{ joueur.resistance }}</td>
                 <td>
-                    <a href="{{ path('app_joueur_show', {'id': joueur.id}) }}">show</a>
-                    <a href="{{ path('app_joueur_edit', {'id': joueur.id}) }}">edit</a>
+{#                    <a href="{{ path('app_joueur_show', {'id': joueur.id}) }}">show</a>#}
+                    <a href="{{ path('app_joueur_edit', {'id': joueur.id}) }}" class="btn btn-warning">Modifier</a>
                 </td>
             </tr>
         {% else %}

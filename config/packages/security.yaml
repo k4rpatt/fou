@@ -9,6 +9,13 @@ security:
             entity:
                 class: App\Entity\User
                 property: username
+
+    role_hierarchy:
+        ROLE_AMBASSADEUR: ROLE_USER
+        ROLE_OFFICIER: ROLE_AMBASSADEUR
+        ROLE_ADMIN: ROLE_OFFICIER
+        ROLE_SUPER_ADMIN: [ ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH ]
+
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -34,8 +41,8 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+         - { path: ^/admin, roles: ROLE_ADMIN }
+         - { path: ^/profile, roles: ROLE_USER }
 
 when@test:
     security:

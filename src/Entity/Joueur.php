@@ -60,6 +60,9 @@ class Joueur
     #[ORM\Column(nullable: true)]
     private ?float $Resistance = null;
 
+    #[ORM\OneToOne(mappedBy: 'joueur', cascade: ['persist', 'remove'])]
+    private ?User $user = null;
+
     public function __construct()
     {
         $this->trains = new ArrayCollection();
@@ -223,6 +226,28 @@ class Joueur
     public function setResistance(float $Resistance): static
     {
         $this->Resistance = $Resistance;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($user === null && $this->user !== null) {
+            $this->user->setJoueur(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($user !== null && $user->getJoueur() !== $this) {
+            $user->setJoueur($this);
+        }
+
+        $this->user = $user;
 
         return $this;
     }

@@ -19,37 +19,98 @@
 
         <div class="container">
             <nav class="navbar navbar-expand-lg navbar-light bg-light">
-                <a class="navbar-brand" href="#">FOU</a>
+                <a class="navbar-brand" href="{{ path('app_homepage') }}">FOU</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav">
-                        <li class="nav-item active">
+                        {% if is_granted('ROLE_AMBASSADEUR') %}
+                        <li class="nav-item">
                             <a class="nav-link" href="{{ path('app_serveur_index') }}">Gestion Serveurs <span class="sr-only">(current)</span></a>
                         </li>
+                        {% endif %}
+                    {% if is_granted('ROLE_OFFICIER') %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Gestion Alliance
                             </a>
                             <ul class="dropdown-menu">
-                                <a class="nav-link" href="{{ path('app_joueur_index') }}">Joueurs</a>
-                                <a class="nav-link" href="{{ path('app_train_index') }}">Trains</a>
+                                <li><a class="nav-link" href="{{ path('app_joueur_index') }}">Joueurs</a></li>
+                                <li><a class="nav-link" href="{{ path('app_train_index') }}">Trains</a></li>
                                 {#                                <li><a class="dropdown-item" href="#">Something else here</a></li>#}
                             </ul>
                         </li>
+                    {%  endif %}
+                    {% if is_granted('ROLE_ADMIN') %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                configuration
+                                <i class="fa-solid fa-gear"></i> configuration
                             </a>
                             <ul class="dropdown-menu">
-                                <a class="nav-link" href="{{ path('app_alliance_index') }}">Alliances</a>
-                                <a class="nav-link" href="{{ path('app_position_index') }}">Positions</a>
-                                <a class="nav-link" href="">Utilisateurs</a>
+                                <li>
+                                    <a class="nav-link " href="{{ path('app_alliance_index') }}">Alliances</a>
+                                </li>
+  <li>
+                                    <a class="nav-link " href="{{ path('app_joueur_index') }}">Joueurs</a>
+                                </li>
+
+                                <li>
+                                    <a class="nav-link" aria-hidden="true" href="{{ path('app_position_index') }}">Positions</a>
+                                </li>
+                                <li>
+                                    <a class="nav-link" aria-hidden="true" href="{{ path('app_admin_user') }}">Utilisateurs</a>
+                                </li>
+{#                                <a class="nav-link" href="{{ path('app_user_index') }}">Utilisateurs</a>#}
 {#                                <a class="nav-link" href="{{ path('app_user_index') }}">Users</a>#}
 {#                                <li><a class="dropdown-item" href="#">Something else here</a></li>#}
                             </ul>
                         </li>
+                    {% endif %}
+                        {% if app.user %}
+
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    {{ app.user.username }}
+                                    <span class="caret"></span>
+                                    <span class="sr-only"><i class="fa-solid fa-user"></i> {{ app.user.username }}</span>
+                                </a>
+
+                                <ul class="dropdown-menu">
+{#                                    <li>#}
+{#                                        <a href="{{ path('user_edit') }}">#}
+{#                                            <i class="fa fa-edit" aria-hidden="true"></i> {{ 'menu.user'|trans }}#}
+{#                                        </a>#}
+{#                                    </li>#}
+                                    <li class="divider"></li>
+
+                                    <li>
+                                        <a class="nav-link " href="{{ path('app_joueur_profil') }}">profil</a>
+                                    </li>
+{#                                    <li>#}
+{#                                        <a class="nav-link " href="{{ path('user_change_password') }}">Changer le password</a>#}
+{#                                    </li>#}
+
+
+                                    {#                                <a class="nav-link" href="{{ path('app_user_index') }}">Utilisateurs</a>#}
+                                    {#                                <a class="nav-link" href="{{ path('app_user_index') }}">Users</a>#}
+                                    {#                                <li><a class="dropdown-item" href="#">Something else here</a></li>#}
+                                </ul>
+                            </li>
+                            <li>
+                                <a class="nav-link "  href="{{ logout_path() }}">
+                                    {#                                            <i class="fa fa-sign-out" aria-hidden="true"></i> #}
+                                    <span class="btn btn-danger" title="Déconnexion"><i class="fa fa-right-from-bracket"></i></span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('app_login') }}"><i class="fa-solid fa-right-to-bracket"></i>login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('app_register') }}">S'inscrire</a>
+                            </li>
+                        {% endif %}
 
                     </ul>
                 </div>
@@ -67,7 +128,12 @@
 
             {% block body %}
                 <div class="row">
-                    <h1>Bienvenue !</h1>
+                   {% if app.user %}   <h1> Bienvenue {{ app.user.username }} ! </h1>
+
+                   {% else %}   <h1>Bienvenue ! </h1>
+                       Vous pouvez maintenant vous connecter ou vous inscrire pour créer un compte.
+                   {% endif %}
+
                 </div>
             {% endblock %}
         </div>

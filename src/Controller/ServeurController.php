@@ -23,8 +23,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/serveur')]
+
 class ServeurController extends AbstractController
 {
     private $largeur = 90;
@@ -45,6 +47,8 @@ class ServeurController extends AbstractController
 
 
     #[Route('/', name: 'app_serveur_index', methods: ['GET'])]
+//    #[IsGranted(new Expression('is_granted("ROLE_ADMIN") or is_granted("ROLE_AMBASSADEUR")'))]
+    #[IsGranted('ROLE_AMBASSADEUR')]
     public function index(ServeurRepository $serveurRepository): Response
     {
         return $this->render('serveur/index.html.twig', [
@@ -53,6 +57,7 @@ class ServeurController extends AbstractController
     }
 
     #[Route('/new', name: 'app_serveur_new', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $serveur = new Serveur();
@@ -74,6 +79,7 @@ class ServeurController extends AbstractController
     }
 
     #[Route('/{numero}', name: 'app_serveur_show', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_AMBASSADEUR')]
     public function show(Request $request,Serveur $serveur, EntityManagerInterface $entityManager, PositionRepository $positionRepository): Response
     {
         $position = new Position();
@@ -203,6 +209,7 @@ class ServeurController extends AbstractController
     }
 
     #[Route('/{numero}/edit', name: 'app_serveur_edit', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function edit(Request $request, Serveur $serveur, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(ServeurType::class, $serveur);
@@ -221,6 +228,7 @@ class ServeurController extends AbstractController
     }
 
     #[Route('/{numero}/delete', name: 'app_serveur_delete', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function delete(Request $request, Serveur $serveur, EntityManagerInterface $entityManager): Response
     {
 //        $this->addFlash('info','tentative de suppression');
@@ -235,6 +243,7 @@ class ServeurController extends AbstractController
 
 
     #[Route('/{numero}/map', name: 'app_serveur_map', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function map(Serveur $serveur,PositionRepository $positionRepository, LoggerInterface $logger): Response
     {
         $imagine = new Imagine();
@@ -318,6 +327,7 @@ class ServeurController extends AbstractController
 
 
     #[Route('{numero}/alliance/new/', name: 'app_serveur_new_alliance', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_AMBASSADEUR')]
     public function new_alliance(Request $request, Serveur $serveur, EntityManagerInterface $entityManager): Response
     {
         $alliance = new Alliance();
@@ -375,6 +385,7 @@ class ServeurController extends AbstractController
        }
 
     #[Route('{numero}/alliance/{id_alliance}/position/new/', name: 'app_serveur_alliance_position_add', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_AMBASSADEUR')]
     public function new_position(Request $request, Serveur $serveur,$id_alliance, EntityManagerInterface $entityManager): Response
     {
 
@@ -403,6 +414,7 @@ class ServeurController extends AbstractController
     }
 
     #[Route('/pos/{id}/delete', name: 'app_serveur_delete_pos')]
+    #[IsGranted('ROLE_AMBASSADEUR')]
     public function deletePosition(Position $position, EntityManagerInterface $entityManager): Response
     {
 
