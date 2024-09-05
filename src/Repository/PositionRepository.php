@@ -56,7 +56,7 @@ class PositionRepository extends ServiceEntityRepository
             ;
         }
 
-    public function findDernierePositionv2($x, $y): ?Position
+    public function findDernierePositionv2($x, $y, $serveur): ?Position
     {
 
         return $this->createQueryBuilder('p')
@@ -64,9 +64,10 @@ class PositionRepository extends ServiceEntityRepository
             ->andWhere('p.posX = :x')
             ->andWhere('p.posY = :y')
 //            ->orderBy('p.moment','DESC')
-//                ->andWhere('p.serveur = :serveur')
+                ->andWhere('p.serveur = :serveur')
             ->setParameter('x', $x)
             ->setParameter('y', $y)
+            ->setParameter('serveur', $serveur)
 //            ->setParameter('serveur', $position->getServeur()->getId())
             ->getQuery()
             ->getOneOrNullResult()

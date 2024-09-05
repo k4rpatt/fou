@@ -29,8 +29,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class ServeurController extends AbstractController
 {
-    private $largeur = 90;
-    private $hauteur = 60;
+    private $largeur = 235;
+    private $hauteur = 185;
     private $xmin = 1;
     private $ymin = 1;
     private $xmax = 90*20;
@@ -101,7 +101,7 @@ class ServeurController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             if ($form->getClickedButton()) {
                 $action = $form->getClickedButton()->getName();
-                $autre_position = $positionRepository->findDernierePositionv2($position->getPosX(),$position->getPosY());
+                $autre_position = $positionRepository->findDernierePositionv2($position->getPosX(),$position->getPosY(),$serveur);
 
                 switch ($action){
                     //suivi
@@ -255,18 +255,22 @@ class ServeurController extends AbstractController
         $today = new \DateTime('now');
         $today->sub($this->duree_immunite);
         //imagescale($image,800);
+        $variationX = 90;
+        $deltaX = 0;
         $image = $this->image;
-        for ($ligne = 1; $ligne < 21; $ligne++) {
-            for ($colonne = 1; $colonne < 21; $colonne++) {
+        for ($ligne = 1; $ligne < 13; $ligne++) {
+            for ($colonne = 1; $colonne < 13; $colonne++) {
+                 if ($colonne == 7)  $deltaX = $variationX;
+                 else $deltaX = 0;
 //                findDernierePositionv2
-                $position= $positionRepository->findDernierePositionv2($colonne, $ligne);
+                $position= $positionRepository->findDernierePositionv2($colonne, $ligne,$serveur);
                 if ($position) {
                     $x = $this->conversionX($position->getPosX());
-                    $y = $this->conversionY($position->getPosX(),$position->getPosY());
+                    $y = $this->conversionY($position->getPosY());
 //          $this->addFlash('warning',' x :'.$position->getPosX().' => '.$x);
                     for ($i = 1; $i < 5; $i++) {
                         //icone
-                        imagerectangle($image,$x+$i,$y+$i,$x+$this->largeur-$i,$y+$this->hauteur-$i,$position->getAlliance()->getGDColor($image));
+                        imagerectangle($image,$x+$i-$deltaX,$y+$i,$x+$this->largeur-$i,$y+$this->hauteur-$i,$position->getAlliance()->getGDColor($image));
                         //          imageellipse($image, $position->getPosX(), $position->getPosY(), 60, 60, $position->getAlliance()->getCouleur());
                         //texte
                         imagestring($image, 5, $x+$this->largeur*0.85-18, $y+$this->hauteur/2-20, $position->getAlliance()->getNom(), $position->getAlliance()->getGDColor($image));
@@ -367,16 +371,17 @@ class ServeurController extends AbstractController
 
 //        $this->image = $this->grille();
 
+        $this->image = imagecreatefrompng('images/map-hq-original.png');
 
 
-        $this->image = imagecreatetruecolor($this->xmax+2*$this->xmin,$this->ymax+2*$this->ymin);
+//        $this->image = imagecreatetruecolor($this->xmax+2*$this->xmin,$this->ymax+2*$this->ymin);
         $background_color = imagecolorallocate($this->image , 255, 255, 255);
         imagefill($this->image, 0, 0, $background_color); // you have to actually use the allocated background color
 
 
 
-        $this->grille();
-        $this->remplirVille();
+//        $this->grille();
+//        $this->remplirVille();
 
 //        $image = $this->grille($largeur, $hauteur, $xmin, $ymin,$xmax,$ymax);
 
@@ -487,33 +492,34 @@ class ServeurController extends AbstractController
 
     private function conversionX($x)
     {
-        return ($x-1)*$this->largeur + $this->xmin;
+        if ($x>6) return ($x-1)*$this->largeur + $this->xmin+90;
+        else return ($x-1)*$this->largeur + $this->xmin;
     }
-    private function conversionY($x,$y)
+    private function conversionY($y)
     {
-        $x--;
-        $y--;
-        if ($x<20){
-            if ($x % 2 === 0) {
-
-                  return $y * $this->hauteur + $this->ymin;
-
-            }
-            else {
-                if ($y == 0)  return $this->ymin;
-                elseif ($y < 19) return ($y + 0.5) * $this->hauteur + $this->ymin;
-                    else return ($y ) * $this->hauteur + $this->ymin;
-
-            }
-
-
-        }
+//        $x--;
+//        $y--;
+//        if ($x<20){
+//            if ($x % 2 === 0) {
+//
+//                  return $y * $this->hauteur + $this->ymin;
+//
+//            }
+//            else {
+//                if ($y == 0)  return $this->ymin;
+//                elseif ($y < 19) return ($y + 0.5) * $this->hauteur + $this->ymin;
+//                    else return ($y ) * $this->hauteur + $this->ymin;
+//
+//            }
+//
+//
+//        }
         return ($y-1)*$this->hauteur;// + $this->ymin;
     }
 
     private function cible($position){
         $x = $this->conversionX($position->getPosX());
-        $y = $this->conversionY($position->getPosX(),$position->getPosY());
+        $y = $this->conversionY($position->getPosY());
         $image = $this->image;
 
 
