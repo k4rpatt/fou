@@ -4,7 +4,7 @@
 
 {% block body %}
     <h1>Joueur</h1>
-{% set progression = joueur.getLastProgression %}
+{#{% set progression = joueur.getLastProgression %}#}
     <table class="table">
         <tbody>
 {#            <tr>#}
@@ -23,35 +23,32 @@
                 <th>Puissance</th>
                 <td>{{ joueur.puissance }}</td>
             </tr>
-{% if progression %}
+        </tbody>
+    </table>
+
+    <table class="table">
+        <thead>
             <tr>
-                <th>Puissance des tanks</th>
-                <td>{{ progression.PCTank }}</td>
+                <td>Date</td>
+                <td>Tank</td>
+                <td>Avion</td>
+                <td>Missile</td>
             </tr>
+        </thead>
+        <tbody>
+        {% for progression in joueur.progressions|reverse  %}
             <tr>
-                <th>Puissance des avions</th>
+                <td>{{ progression.dateProgression |date("d/m/y") }}</td>
+                <td>{{ progression.PCTank }}</td>
                 <td>{{ progression.PCAvion }}</td>
-            </tr><tr>
-                <th>Puissance des missiles</th>
                 <td>{{ progression.PCMissile }}</td>
             </tr>
-{% endif %}
-{#            <tr>#}
-{#                <th>PC_equipe4</th>#}
-{#                <td>{{ joueur.PCEquipe4 }}</td>#}
-{#            </tr>#}
-            <tr>
-                <th>Résistance</th>
-                <td>{{ joueur.resistance }}</td>
-            </tr>
+        {% endfor %}
         </tbody>
     </table>
 
 
 
-    <a href="{{ path('app_joueur_edit', {'id': joueur.id}) }}" class="btn btn-warning">Modifier</a>
-    <a href="{{ path('app_joueur_majpc', {'id': joueur.id}) }}" class="btn btn-warning">Mise à jour des puissances</a>
-    <a href="{{ path('app_joueur_historique') }}" class="btn btn-warning">Historique</a>
     {% if is_granted('ROLE_OFFICIER') %}
         <a href="{{ path('app_joueur_index') }}" class="btn btn-primary">Retour à la liste</a>
         {{ include('joueur/_delete_form.html.twig') }}

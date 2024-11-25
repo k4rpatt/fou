@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Joueur;
+use App\Entity\Progression;
 use App\Entity\User;
 use App\Form\JoueurType;
+use App\Form\ProgressionType;
 use App\Repository\JoueurRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -64,6 +66,18 @@ class JoueurController extends AbstractController
         ]);
     }
 
+    #[Route('/historique', name: 'app_joueur_historique', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
+    public function historique(JoueurRepository $joueurRepository, EntityManagerInterface   $entityManager): Response
+    {
+        $user = $this->getUser();
+
+        $joueur = $user->getJoueur();
+
+        return $this->render('joueur/historique.html.twig', [
+            'joueur' => $joueur,
+        ]);
+    }
 
     #[Route('/new', name: 'app_joueur_new', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_OFFICIER')]
@@ -98,6 +112,28 @@ class JoueurController extends AbstractController
             $entityManager->flush();
 
             return $this->redirectToRoute('app_joueur_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->render('joueur/edit.html.twig', [
+            'joueur' => $joueur,
+            'form' => $form,
+        ]);
+    }
+
+    #[Route('/{id}/majpc', name: 'app_joueur_majpc', methods: ['GET', 'POST'])]
+    public function majpc(Request $request, Joueur $joueur, EntityManagerInterface $entityManager): Response
+    {
+        $progression = new Progression();
+        $today = new \DateTime();
+        $progression->setJoueur($joueur)->setDateProgression($today);
+        $form = $this->createForm(ProgressionType::class, $progression);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->persist($progression);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('app_joueur_profil', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('joueur/edit.html.twig', [

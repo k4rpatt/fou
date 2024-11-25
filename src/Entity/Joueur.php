@@ -63,10 +63,17 @@ class Joueur
     #[ORM\OneToOne(mappedBy: 'joueur', cascade: ['persist', 'remove'])]
     private ?User $user = null;
 
+    /**
+     * @var Collection<int, Progression>
+     */
+    #[ORM\OneToMany(targetEntity: Progression::class, mappedBy: 'joueur', orphanRemoval: true)]
+    private Collection $progressions;
+
     public function __construct()
     {
         $this->trains = new ArrayCollection();
         $this->passagers = new ArrayCollection();
+        $this->progressions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -248,6 +255,41 @@ class Joueur
         }
 
         $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Progression>
+     */
+    public function getProgressions(): Collection
+    {
+        return $this->progressions;
+    }
+
+    public function getLastProgression()
+    {
+//        $this->getProgressions();
+        return $this->progressions->last();
+    }
+    public function addProgression(Progression $progression): static
+    {
+        if (!$this->progressions->contains($progression)) {
+            $this->progressions->add($progression);
+            $progression->setJoueur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProgression(Progression $progression): static
+    {
+        if ($this->progressions->removeElement($progression)) {
+            // set the owning side to null (unless already changed)
+            if ($progression->getJoueur() === $this) {
+                $progression->setJoueur(null);
+            }
+        }
 
         return $this;
     }
