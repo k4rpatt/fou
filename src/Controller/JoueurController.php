@@ -9,6 +9,7 @@ use App\Form\JoueurType;
 use App\Form\ProgressionType;
 use App\Repository\JoueurRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Ob\HighchartsBundle\Highcharts\Highchart;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -74,8 +75,38 @@ class JoueurController extends AbstractController
 
         $joueur = $user->getJoueur();
 
+        $tank = array();
+        $avion = array();
+        $missile = array();
+        $dates = array();
+
+        foreach ($joueur->getProgressions() as $progression) {
+            $tank[] = $progression->getPCTank();
+            $avion[] = $progression->getPCAvion();
+            $missile[] = $progression->getPCMissile();
+            $dates[] = $progression->getDateProgression()->format('d/m/Y');
+        }
+
+        $series = array(
+            array("name" => "Tank",    "data" => $tank),
+            array("name" => "Avion",    "data" => $avion),
+            array("name" => "Missile",    "data" => $missile),
+        );
+
+        $ob = new Highchart();
+        $ob->chart->renderTo('linechart');  // The #id of the div where to render the chart
+        $ob->chart->type('column');
+        $ob->title->text('Evolution des puissances');
+//        $ob->xAxis->title(array('text'  => "Horizontal axis title"));
+        $ob->xAxis->categories($dates);
+        $ob->yAxis->title(array('text'  => "Puissance"));
+        $ob->plotOptions->column(array('stacking' => 'normal','dataLabels' => array('enabled' => true)));
+        $ob->series($series);
+
+
         return $this->render('joueur/historique.html.twig', [
             'joueur' => $joueur,
+            'chart' => $ob
         ]);
     }
 

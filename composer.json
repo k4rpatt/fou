@@ -8,6 +8,7 @@
         "ext-ctype": "*",
         "ext-gd": "*",
         "ext-iconv": "*",
+        "94noni/highcharts-bundle": "^2.2",
         "amphp/http-client": "^4.2.1",
         "doctrine/dbal": "^3",
         "doctrine/doctrine-bundle": "^2.12",

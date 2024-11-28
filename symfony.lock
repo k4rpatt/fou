@@ -1,4 +1,7 @@
 {
+    "94noni/highcharts-bundle": {
+        "version": "v2.2.0"
+    },
     "doctrine/doctrine-bundle": {
         "version": "2.12",
         "recipe": {
